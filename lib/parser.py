@@ -1,10 +1,10 @@
+#!/usr/bin/env python3
 """Iteratively parse data into mongoDB
 Dependency: ijson
-
-
 """
 import io
 import ijson
+from pprint import pprint
 
 
 class Parser(object):
@@ -43,19 +43,20 @@ class Parser(object):
         for json in list_json:
             item = ijson.items(io.BytesIO(json), "")
             for i in item:
-                print(i['business_id'])
+                pprint(i)
 
 
 def test():
     """Testing"""
-    business = "/Users/tlw/Desktop/yelp-data/test.json"
+    business = "../data/testParser.json"
     parser = Parser(business)
     for i in parser.get_entries(20):
-        print(i)
+        pprint(i)
 
 
 def test_ijson_reader():
-    business = "/Users/tlw/Desktop/yelp-data/test.json"
+    """Testing ijson"""          
+    business = "../data/testParser.json"
     parser = Parser(business)
     jsons = parser.read_thousand_lines()
     parser.ijson_reader(jsons)

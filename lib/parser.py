@@ -21,6 +21,7 @@ class Parser(object):
                 if counter == num:
                     break
                 yield line 
+
     def print_entries(self, num):
         """print entries"""
         for i in self.get_entries(num):
@@ -38,13 +39,12 @@ class Parser(object):
                 l.append(line)
             return l
     
-    def ijson_reader(self, list_json):
+    def iter_parse(self, list_json):
         """Parse a list of json files"""
         for json in list_json:
-            item = ijson.items(io.BytesIO(json), "")
-            for i in item:
-                pprint(i)
-
+            parsed_json = ijson.items(io.BytesIO(json), "")
+            yield parsed_json
+                
 
 def test():
     """Testing"""
@@ -59,9 +59,9 @@ def test_ijson_reader():
     business = "../data/testParser.json"
     parser = Parser(business)
     jsons = parser.read_thousand_lines()
-    parser.ijson_reader(jsons)
-
-
+    parser.iter_parse(jsons)
+    
+    
 if __name__ == "__main__":
     # test()
     test_ijson_reader()

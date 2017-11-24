@@ -22,39 +22,26 @@ class Parser(object):
             thousand_lines = list()
             counter = 0
             for line in json_file:
-                thousand_lines.append(line)
-                counter += 1
-                if counter == NUM:
-                    yield thousand_lines
-                    counter = 0
+                yield line
 
     @staticmethod
     def iter_parse(list_json):
         """Parse a list of json files"""
         for json in list_json:
-            print(json)
             parsed_json = ijson.items(io.BytesIO(json), "")
             for val in parsed_json:
                 yield val
 
     def get_entries(self, num):
-        """Get `num` of entries.
-
-        Note:
-            Currently only support num as a factor of 1000
-            i.e. num % 1000 = 0
-        
-        TODO:
-            Refactor it to take exactly `num` entries
-        """
+        """Get `num` of entries. """
         counter = 0
-        for lines in self.read_lines():
-            for entry in self.iter_parse(lines):
-                yield entry
-            counter += 1000
-            if counter > num:
+        for line in self.read_lines():
+            counter += 1
+            for val in ijson.items(io.BytesIO(line), ""):
+                yield val
+            if counter >= num:
                 break
-
+                
 
 def test_ijson_reader():
     """Testing ijson"""
@@ -69,7 +56,7 @@ def test_get_entries(file_path):
     """"""
     parser = Parser(file_path)
     for i in parser.get_entries(2000):
-        pprint(i)
+        print(i)
 
 
 if __name__ == "__main__":

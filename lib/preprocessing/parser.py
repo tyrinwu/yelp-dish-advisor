@@ -12,56 +12,55 @@ class Parser(object):
     def __init__(self, file_path):
         self.file_path = file_path
 
-    def get_entries(self, num):
-        """get `num` entries from the json file"""
+    def read_lines(self, NUM=1000):
+        """Read `num` lines a time and yield it"""
         with open(self.file_path, 'rb') as json_file:
+            thousand_lines = list()
             counter = 0
             for line in json_file:
+                thousand_lines.append(line)
                 counter += 1
-                if counter == num:
-                    break
-                yield line 
+                if counter == NUM:
+                    yield thousand_lines
+                    counter = 0
 
-    def print_entries(self, num):
-        """print entries"""
-        for i in self.get_entries(num):
-            print(i)
-
-    def read_thousand_lines(self):
-        """Process 1000 lines a time"""
-        with open(self.file_path, 'rb') as json_file:
-            l = list()
-            counter = 0
-            for line in json_file:
-                counter += 1
-                if counter == 1000:
-                    break
-                l.append(line)
-            return l
-    
-    def iter_parse(self, list_json):
+    @staticmethod
+    def iter_parse(list_json):
         """Parse a list of json files"""
         for json in list_json:
+            print(json)
             parsed_json = ijson.items(io.BytesIO(json), "")
-            yield parsed_json
-                
+            for val in parsed_json:
+                yield val
 
-def test():
-    """Testing"""
-    business = "../data/testParser.json"
-    parser = Parser(business)
-    for i in parser.get_entries(20):
-        pprint(i)
+    def get_entries(self, num):
+        """Get `num` of entries."""
+        counter = 0
+        for thousand_lines in self.read_thousand_lines():
+            print(thousand_lines)
+            for entry in self.iter_parse(thousand_lines):
+                yield entry
+            counter += 1000
+            if counter > num:
+                break
 
 
 def test_ijson_reader():
     """Testing ijson"""          
-    business = "../data/testParser.json"
+    business = "../../data/testParser.json"
     parser = Parser(business)
     jsons = parser.read_thousand_lines()
-    parser.iter_parse(jsons)
-    
-    
+    for i in parser.iter_parse(jsons):
+        pprint(i)
+
+
+def test_get_entries(file_path):
+    parser = Parser(file_path)
+    for i in parser.get_entries(2000):
+        pprint(i)
+
+
 if __name__ == "__main__":
     # test()
-    test_ijson_reader()
+    # test_ijson_reader()
+    test_get_entries("/Users/tlw/Desktop/yelp-data/10000/review-10000.json")

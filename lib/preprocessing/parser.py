@@ -8,34 +8,29 @@ from pprint import pprint
 
 
 class Parser(object):
-    """Iterative Parser"""
+    """Iterative Parser
+    
+    Args: 
+        file_path
+
+    Usage:
+        Users should call get_entries(num) where num
+        is the number of lines one needs.
+    """
     def __init__(self, file_path):
         self.file_path = file_path
 
-    def read_lines(self, NUM=1000):
-        """Read `num` lines a time and yield it
-        
-        Args:
-            NUM (int): number of json strings parsed
-        """
+    def _read_lines(self):
+        """Private function"""
         with open(self.file_path, 'rb') as json_file:
             thousand_lines = list()
-            counter = 0
             for line in json_file:
                 yield line
 
-    @staticmethod
-    def iter_parse(list_json):
-        """Parse a list of json files"""
-        for json in list_json:
-            parsed_json = ijson.items(io.BytesIO(json), "")
-            for val in parsed_json:
-                yield val
-
-    def get_entries(self, num):
+    def get_entries(self, num=10):
         """Get `num` of entries. """
         counter = 0
-        for line in self.read_lines():
+        for line in self._read_lines():
             counter += 1
             for val in ijson.items(io.BytesIO(line), ""):
                 yield val

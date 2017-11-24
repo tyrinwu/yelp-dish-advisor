@@ -36,7 +36,7 @@ class Parser(object):
     def get_entries(self, num):
         """Get `num` of entries."""
         counter = 0
-        for thousand_lines in self.read_thousand_lines():
+        for thousand_lines in self.read_lines():
             print(thousand_lines)
             for entry in self.iter_parse(thousand_lines):
                 yield entry
@@ -49,7 +49,7 @@ def test_ijson_reader():
     """Testing ijson"""          
     business = "../../data/testParser.json"
     parser = Parser(business)
-    jsons = parser.read_thousand_lines()
+    jsons = parser.read_lines()
     for i in parser.iter_parse(jsons):
         pprint(i)
 
@@ -61,6 +61,6 @@ def test_get_entries(file_path):
 
 
 if __name__ == "__main__":
-    # test()
-    # test_ijson_reader()
-    test_get_entries("/Users/tlw/Desktop/yelp-data/10000/review-10000.json")
+    # To test the program, chancge 
+    review_path = "/Users/tlw/Desktop/yelp-data/review.json"
+    test_get_entries(review_path)

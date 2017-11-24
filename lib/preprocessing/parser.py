@@ -3,7 +3,7 @@
 Dependency: ijson
 """
 import io
-import ijson
+import ijson.backends.yajl2 as ijson
 from pprint import pprint
 
 

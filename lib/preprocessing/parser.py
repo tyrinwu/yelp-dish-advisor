@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Iteratively parse data into mongoDB
-Dependency: ijson
+"""Iteratively parse data
 """
 import io
-import ijson
+import json
 from pprint import pprint
 
 
@@ -45,8 +44,9 @@ class Parser(object):
         counter = 0
         for line in self._read_lines():
             counter += 1
-            for val in ijson.items(io.BytesIO(line), ""):
-                yield func(val)
+            yield func(json.loads(line))
+            # for val in ijson.items(io.BytesIO(line), ""):
+            #    yield func(val)
             if unlimited is False and counter >= num:
                 break
 
@@ -63,11 +63,11 @@ def test_ijson_reader():
 def test_get_entries(file_path):
     """"""
     parser = Parser(file_path)
-    for i in parser.get_entries(2000, func=lambda x: x["latitude"]):
+    for i in parser.get_entries(20000):
         print(i)
 
 
 if __name__ == "__main__":
     # To test the program, chancge the review_path below
-    review_path = "/Users/tlw/Desktop/yelp-data/business.json"
+    review_path = "/Users/tlw/Desktop/yelp-data/review.json"
     test_get_entries(review_path)

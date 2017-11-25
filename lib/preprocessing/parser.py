@@ -69,5 +69,5 @@ def test_get_entries(file_path):
 
 if __name__ == "__main__":
     # To test the program, chancge the review_path below
-    review_path = "/Users/tlw/Desktop/yelp-data/review.json"
-    test_get_entries(review_path)
+    test_path = "/Users/tlw/Desktop/yelp-data/review.json"
+    test_get_entries(test_path)

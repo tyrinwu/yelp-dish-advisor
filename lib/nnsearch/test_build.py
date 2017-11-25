@@ -2,23 +2,53 @@
 
 """
 import sys
+import time
 sys.path.append("..")
 from build import AnnoyTreeBuilder as atb
 from preprocessing import parser
+from sentiment.sentiment import get_sentiment
 
 def test_geodistance():
+    def get_loc(x):
+        try:
+            return x["latitude"], x["longitude"]
+        except KeyError:
+            print("....")
+
     tree = atb()
     p = parser.Parser("/Users/tlw/Desktop/yelp-data/business.json")
-    # tree.build_iter()
     generator = p.get_entries(func=get_loc, unlimited=True)
-    t = tree.build_iter("", generator, 2, 100000)
+    t = tree.build_iter(generator, 2, 10000000)
+    begin = time.time()
     for j in t.get_nns_by_item(1, 50):
         print(t.get_distance(1,j))
+    print("---- {}".format(time.time() - begin))
+    t.save("test.ann")
 
-def get_loc(x):
-    try:
-        return x["latitude"], x["longitude"]
-    except KeyError:
-        print("....")
+def test_sentiment_closeness():
+    def get_review_sentimentment(x):
+        try:
+            return get_sentiment(x['text'])
+        except KeyError:
+            print("KeyError in get_review_sentiment")
+    tree = atb()
+    p = parser.Parser("/Users/tlw/Desktop/yelp-data/review.json")
+    generator = p.get_entries(unlimited=True)
+    t, mapping = tree.build_iter_testing(generator, 2, 1000, func=get_review_sentimentment)
+    begin = time.time()
+    for j in t.get_nns_by_item(16, 50):
+        print("----")
+        print(mapping[j][1]["text"])
+        print(mapping[j][0])
+        print(j)
+        print("----")
+    print("---------------------------")
+    print(mapping[16][1]["text"])
+    print(mapping[16][0])
+    print("---- {}".format(time.time() - begin))
+    t.save("test_sent.ann")
 
-test_geodistance()
+
+if __name__ == "__main__":
+    test_geodistance()
+    #test_sentiment_closeness()

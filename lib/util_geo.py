@@ -18,3 +18,6 @@ def get_distance(coord1, coord2):
         coord2 {Tuple[float, float]} -- GPS coordinate
     """
     return vincenty(coord1, coord2).miles
+
+if __name__ == "__main__":
+    print(get_gps_crd("Durham, NC 27708"))

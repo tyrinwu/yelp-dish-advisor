@@ -5,8 +5,6 @@ random projection.
 Because it uses random projection, there could be cases that it separates
 two close points into 2 far away planes.
 
-TODO: Location based hashing and similarity based hashing
-
 Dependency:
     annoy
 
@@ -45,21 +43,50 @@ class AnnoyTreeBuilder(object):
     def __init__(self, num_tree=2):
         self.num_tree = num_tree
 
-    def build_iter(self, file_name, generator, num_feat, num_input, func=None):
+    def build_iter(self, features, num_feat, num_input, func=None):
+        """Build a search tree based on a list of features.
+
+        This build the tree from a generator.
+
+        Arguments:
+            features {generator} -- list of items' features
+            num_feat {int} -- number of features of an item
+            num_input {int} -- total input
+
+        Keyword Arguments:
+            func {function} -- function to tune features (default: {None})
+
+        Returns:
+            tree {AnnoyIndex object}
+        """
+
         tree = AnnoyIndex(num_feat)
         if func is None:
             func = lambda x: x
-        try:
-            for idx, val in enumerate(generator):
-                if idx >= num_input:
-                    break
-                if self.contain_missing_data(val, num_feat):
-                    continue
-                tree.add_item(idx, func(val))
-        except StopIteration:
-            raise ValueError("Not enough input from the generator.")
+        for idx, val in enumerate(features):
+            if idx >= num_input:
+                break
+            if self.contain_missing_data(val, num_feat):
+                continue
+            tree.add_item(idx, func(val))
         tree.build(self.num_tree)
         return tree
+
+    def build_iter_testing(self, features, num_feat, num_input, func=None):
+        """Save an extra mapping for the testing purpose"""
+        tree = AnnoyIndex(num_feat)
+        mapping = dict()
+        if func is None:
+            func = lambda x: x
+        for idx, val in enumerate(features):
+            if idx >= num_input:
+                break
+            if self.contain_missing_data(val, num_feat):
+                continue
+            tree.add_item(idx, func(val))
+            mapping[idx] = [func(val), val]
+        tree.build(self.num_tree)
+        return tree, mapping
 
     @staticmethod
     def contain_missing_data(feature, num_feat):

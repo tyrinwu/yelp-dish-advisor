@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Yelp Dish Advisor{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>Hello, {% if preferences %}Search Begins{% else %}Please enter location and preferences{% endif %}!</h1>
+</div>
+{{ wtf.quick_form(form) }}
+{% endblock %}
+
